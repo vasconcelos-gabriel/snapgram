@@ -24,7 +24,7 @@ import { useUserContext } from '@/context/AuthContext'
 const SignupForm = () => {
   const { toast } = useToast()
   const navigate = useNavigate()
-  const { checkAuthUser, isLoading: isUseLoading } = useUserContext()
+  const { checkAuthUser, isLoading: isUserLoading } = useUserContext()
 
   const { mutateAsync: createUserAccount, isPending: isCreatingUser } =
     useCreateUserAccount()
@@ -53,11 +53,14 @@ const SignupForm = () => {
       email: values.email,
       password: values.password
     })
-    if (!newUser) {
-      return toast({
-        title: 'Sign up failed. Please try again'
-      })
+    if (!session) {
+      toast({ title: "Something went wrong. Please login your new account", });
+      
+      navigate("/sign-in");
+      
+      return;
     }
+
     const isLoggedIn = await checkAuthUser()
     if (isLoggedIn) {
       form.reset()
@@ -136,7 +139,7 @@ const SignupForm = () => {
             )}
           />
           <Button type="submit" className="shad-button_primary">
-            {isCreatingUser ? (
+            {isCreatingUser || isSigningIn || isUserLoading ? (
               <div className="flex-center gap-2">
                 <Loader /> Loading...
               </div>
